@@ -32,12 +32,11 @@ function draw() {
   treble = fft.getEnergy("treble");
 
   bass = fft.getEnergy("bass");
-  // bassHistory.push(bass);
+  bassHistory.push(bass);
+
+  console.log(bassHistory)
 
   let bins=[bass,lowMid,mid,highMid,treble];
-  // console.log("Bass: "+bass+" lowMid: "+lowMid+" mid: "+mid+" highMid: "+highMid+" treble: "+treble);
-  console.log(bass);
-
 
   if (vol > 0.2) {
     colHistory.push('red');
@@ -49,7 +48,7 @@ function draw() {
     noStroke()
 
     let y = map(volHistory[x], 0, 1, height, 0);
-    let bassP = map(bassHistory[x], 0, 1, height, 0);
+    let map_bass = map(bassHistory[x], 0, 255, 0, 255);
 
     // change colour based on amplitude
     // let colourMap = map(colHistory[], 0, 255, 0, 255);
@@ -57,7 +56,8 @@ function draw() {
     // console.log(colHistory[x])
 
 
-    ellipse(x, bass, y/80, y/80);
+    ellipse(x, y, y/80, y/80);
+    ellipse(x, map_bass, map_bass/80, map_bass/80);
     // rect(x, y, x/90, y/90);
     // point(x, y);
   }
