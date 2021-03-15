@@ -1,68 +1,74 @@
-let yoff = 0.0; // 2nd dimension of perlin noise
 
-function preload(){
-  sound = loadSound('music/pyramid_song.mp3');
+
+let song, amp, colour, fft;
+let volHistory = [];
+let bassHistory = [];
+let colHistory = ['red'];
+
+fft = new p5.FFT();
+
+function preload() {
+  song = loadSound('music/pyramid_song.mp3');
+  getAudioContext().resume();
 }
 
 function setup() {
-  let cnv = createCanvas(400, 400);
-  cnv.mouseClicked(toggleSound);
-  amplitude = new p5.Amplitude();
+  createCanvas(windowWidth, windowHeight)
+  song.play();
+  amp = new p5.Amplitude();
 }
 
 function draw() {
-  background(225, 224);
-  textAlign(CENTER);
-  text('tap to play', width/2, 20);
+  background(0);
+  let vol = amp.getLevel();
+  volHistory.push(vol);
 
-  let level = amplitude.getLevel();
-  let size = map(level, 0, 1, 0, 200);
-  ellipse(size+10, yoff, size, size);
-  yoff += size*0.01;
+  let spectrum = fft.analyze();
+  let bass, lowMid, mid, highMid, treble;
 
-  for(let i = 0; i < width; i+=10){
-    line(0, i, size, size);
+  lowMid = fft.getEnergy("lowMid");
+  mid = fft.getEnergy("mid");
+  highMid = fft.getEnergy("highMid");
+  treble = fft.getEnergy("treble");
+
+  bass = fft.getEnergy("bass");
+  // bassHistory.push(bass);
+
+  let bins=[bass,lowMid,mid,highMid,treble];
+  // console.log("Bass: "+bass+" lowMid: "+lowMid+" mid: "+mid+" highMid: "+highMid+" treble: "+treble);
+  console.log(bass);
+
+
+  if (vol > 0.2) {
+    colHistory.push('red');
+  } else if (vol < 0.2) {
+    colHistory.push('yellow');
   }
 
+  for (let x = 0; x < volHistory.length; x++) {
+    noStroke()
 
-  // // We are going to draw a polygon out of the wave points
-  // beginShape();
-  //
-  // let xoff = 0; // Option #1: 2D Noise
-  // // let xoff = yoff; // Option #2: 1D Noise
-  //
-  // // Iterate over horizontal pixels
-  // for (let x = 0; x <= width; x += 10) {
-  //   // Calculate a y value according to noise, map to
-  //
-  //   // Option #1: 2D Noise
-  //   // let y = map(noise(xoff, yoff), 0, 1, 200, 300);
-  //   let y = map(xoff, size*yoff, 0, 1, 200, 300);
-  //
-  //   // Option #2: 1D Noise
-  //   // let y = map(noise(xoff), 0, 1, 200,300);
-  //
-  //   // Set the vertex
-  //   vertex(size, size);
-  //   // Increment x dimension for noise
-  //   xoff += 0.05;
-  // }
-  // // increment y dimension for noise
-  // yoff += 0.01;
-  // vertex(width, height);
-  // vertex(0, height);
-  // endShape(CLOSE);
+    let y = map(volHistory[x], 0, 1, height, 0);
+    let bassP = map(bassHistory[x], 0, 1, height, 0);
 
-}
+    // change colour based on amplitude
+    // let colourMap = map(colHistory[], 0, 255, 0, 255);
+    // fill(colHistory[x])
+    // console.log(colHistory[x])
 
-function toggleSound(){
-  if (sound.isPlaying()) {
-    sound.stop();
-  } else {
-    sound.play();
+
+    ellipse(x, bass, y/80, y/80);
+    // rect(x, y, x/90, y/90);
+    // point(x, y);
   }
+  // console.log(vol)
 }
 
+// Chrome 70 will require user gestures required to enable web audio api
+// Click on the web page to start audio
+function touchStarted() {
+  getAudioContext().resume();
+}
 
 
 
