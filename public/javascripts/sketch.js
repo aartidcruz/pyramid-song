@@ -16,7 +16,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(5000, 1000)
+  createCanvas(7000, 1000)
   song.play();
   // song.jump(190)
   amp = new p5.Amplitude();
@@ -24,14 +24,14 @@ function setup() {
 }
 
 function draw() {
-  background(255, 255, 255, SVG);
+  background(255, 255, 255);
   let vol = amp.getLevel();
   volHistory.push(vol);
-
-  if (record == true) {
-    save("mySVG.svg"); // give file name
-    record = false;
-  }
+  //
+  // if (record == true) {
+  //   save("mySVG.svg"); // give file name
+  //   record = false;
+  // }
 
   let spectrum = fft.analyze();
   let bass, lowMid, mid, highMid, treble;
@@ -72,7 +72,6 @@ function draw() {
 
     let y = map(volHistory[x], 0, 1, height, 0);
     let noiseVal = noise((bassHistory[x])*noiseScale, bassHistory[x]*noiseScale);
-    console.log(noiseVal)
     let map_bass = (map(bassHistory[x], 0, 300, 0, height));
     let map_treble = map(trebleHistory[x], 0, 150, height, 0);
 
@@ -83,7 +82,6 @@ function draw() {
     // change colour based on amplitude
     // let colourMap = map(colHistory[], 0, 255, 0, 255);
     fill(0, 0, 0)
-    // console.log(colHistory[x])
 
 
     ellipse(x, y, y/80, y/80);
@@ -111,7 +109,7 @@ function touchStarted() {
   getAudioContext().resume();
 }
 
-
-function mousePressed() {
-  record = true;
-}
+//
+// function mousePressed() {
+//   record = true;
+// }
