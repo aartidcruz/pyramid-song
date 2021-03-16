@@ -3,6 +3,11 @@
 let song, amp, colour, fft;
 let volHistory = [];
 let bassHistory = [];
+let lowMidHistory = [];
+let midHistory = [];
+let highMidHistory = [];
+let trebleHistory = [];
+let noiseScale=0.001;
 let colHistory = ['red'];
 
 fft = new p5.FFT();
@@ -15,6 +20,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight)
   song.play();
+  // song.jump(120)
   amp = new p5.Amplitude();
 }
 
@@ -26,15 +32,26 @@ function draw() {
   let spectrum = fft.analyze();
   let bass, lowMid, mid, highMid, treble;
 
-  lowMid = fft.getEnergy("lowMid");
-  mid = fft.getEnergy("mid");
-  highMid = fft.getEnergy("highMid");
-  treble = fft.getEnergy("treble");
-
+  // Map Bass
   bass = fft.getEnergy("bass");
   bassHistory.push(bass);
 
-  console.log(bassHistory)
+  // Map lowMid
+  lowMid = fft.getEnergy("lowMid");
+  lowMidHistory.push(lowMid);
+
+  // Map Mid
+  mid = fft.getEnergy("mid");
+  midHistory.push(mid);
+
+  // Map High Mid
+  highMid = fft.getEnergy("highMid");
+  highMidHistory.push(highMid);
+
+  // Map Treble
+  treble = fft.getEnergy("treble");
+  trebleHistory.push(treble);
+
 
   let bins=[bass,lowMid,mid,highMid,treble];
 
@@ -48,7 +65,14 @@ function draw() {
     noStroke()
 
     let y = map(volHistory[x], 0, 1, height, 0);
-    let map_bass = map(bassHistory[x], 0, 255, 0, 255);
+    let noiseVal = noise((bassHistory[x])*noiseScale, bassHistory[x]*noiseScale);
+    console.log(noiseVal)
+    let map_bass = (map(bassHistory[x], 0, 200, 0, 900));
+    let map_treble = map(trebleHistory[x], 0, 100, height, 0);
+
+    let map_highmid = map(highMidHistory[x], 0, 255, height, 0);
+    let map_lowMid = (map(lowMidHistory[x], 0, 255, height, 0));
+    let map_mid = (map(midHistory[x], 0, 255, height, 0));
 
     // change colour based on amplitude
     // let colourMap = map(colHistory[], 0, 255, 0, 255);
@@ -56,12 +80,23 @@ function draw() {
     // console.log(colHistory[x])
 
 
-    ellipse(x, y, y/80, y/80);
-    ellipse(x, map_bass, map_bass/80, map_bass/80);
+    // ellipse(x, y, y/80, y/80);
+    fill(255, 255, 255, 80)
+    ellipse(x, map_bass, map_bass/90, (map_bass/90)*noiseVal);
+    ellipse(x+5, map_bass+5, map_bass/90, (map_bass/90)*noiseVal);
+    ellipse(x-5, map_bass-5, map_bass/90, (map_bass/90)*noiseVal);
+    ellipse(x-10, map_bass+10, map_bass/90, (map_bass/90)*noiseVal);
+    ellipse(x+10, map_bass-10, map_bass/90, (map_bass/90)*noiseVal);
+    console.log(noiseVal, map_bass)
+    fill(255, 255, 255, 100)
+
+    ellipse(x, map_treble-200, map_treble/60, map_treble/60);
+    // ellipse(x, map_lowMid, map_lowMid/50, map_lowMid/50);
+    // ellipse(x, map_mid, map_mid/50, map_mid/50);
+    // ellipse(x, map_highmid, map_highmid/50, map_highmid/50);
     // rect(x, y, x/90, y/90);
     // point(x, y);
   }
-  // console.log(vol)
 }
 
 // Chrome 70 will require user gestures required to enable web audio api
