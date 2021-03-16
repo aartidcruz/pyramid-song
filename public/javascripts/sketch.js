@@ -1,6 +1,4 @@
-
-
-let song, amp, colour, fft;
+let song, amp, colour, fft, record;
 let volHistory = [];
 let bassHistory = [];
 let lowMidHistory = [];
@@ -18,16 +16,22 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas(5000, 1000)
   song.play();
-  // song.jump(120)
+  // song.jump(190)
   amp = new p5.Amplitude();
+  fft.setInput(song);
 }
 
 function draw() {
-  background(0);
+  background(255, 255, 255, SVG);
   let vol = amp.getLevel();
   volHistory.push(vol);
+
+  if (record == true) {
+    save("mySVG.svg"); // give file name
+    record = false;
+  }
 
   let spectrum = fft.analyze();
   let bass, lowMid, mid, highMid, treble;
@@ -55,6 +59,8 @@ function draw() {
 
   let bins=[bass,lowMid,mid,highMid,treble];
 
+  // save SVG
+
   if (vol > 0.2) {
     colHistory.push('red');
   } else if (vol < 0.2) {
@@ -67,8 +73,8 @@ function draw() {
     let y = map(volHistory[x], 0, 1, height, 0);
     let noiseVal = noise((bassHistory[x])*noiseScale, bassHistory[x]*noiseScale);
     console.log(noiseVal)
-    let map_bass = (map(bassHistory[x], 0, 200, 0, 900));
-    let map_treble = map(trebleHistory[x], 0, 100, height, 0);
+    let map_bass = (map(bassHistory[x], 0, 300, 0, height));
+    let map_treble = map(trebleHistory[x], 0, 150, height, 0);
 
     let map_highmid = map(highMidHistory[x], 0, 255, height, 0);
     let map_lowMid = (map(lowMidHistory[x], 0, 255, height, 0));
@@ -76,22 +82,22 @@ function draw() {
 
     // change colour based on amplitude
     // let colourMap = map(colHistory[], 0, 255, 0, 255);
-    // fill(colHistory[x])
+    fill(0, 0, 0)
     // console.log(colHistory[x])
 
 
-    // ellipse(x, y, y/80, y/80);
-    fill(255, 255, 255, 80)
-    ellipse(x, map_bass, map_bass/90, (map_bass/90)*noiseVal);
-    ellipse(x+5, map_bass+5, map_bass/90, (map_bass/90)*noiseVal);
-    ellipse(x-5, map_bass-5, map_bass/90, (map_bass/90)*noiseVal);
-    ellipse(x-10, map_bass+10, map_bass/90, (map_bass/90)*noiseVal);
-    ellipse(x+10, map_bass-10, map_bass/90, (map_bass/90)*noiseVal);
-    console.log(noiseVal, map_bass)
-    fill(255, 255, 255, 100)
-
-    ellipse(x, map_treble-200, map_treble/60, map_treble/60);
-    // ellipse(x, map_lowMid, map_lowMid/50, map_lowMid/50);
+    ellipse(x, y, y/80, y/80);
+    ellipse(x, map_treble-100, map_treble/80, map_treble/80);
+    // fill(255, 255, 255, 80)
+    // ellipse(x, map_bass, map_bass/90, (map_bass/90)*noiseVal);
+    // ellipse(x+5, map_bass+5, map_bass/90, (map_bass/90)*noiseVal);
+    // ellipse(x-5, map_bass-5, map_bass/90, (map_bass/90)*noiseVal);
+    // ellipse(x-10, map_bass+10, map_bass/90, (map_bass/90)*noiseVal);
+    // ellipse(x+10, map_bass-10, map_bass/90, (map_bass/90)*noiseVal);
+    // console.log(map_treble)
+    // // fill(255, 255, 255, 100)
+    //
+    // ellipse(x, map_lowMid, map_lowMid/20, (map_lowMid/20)*noiseVal);
     // ellipse(x, map_mid, map_mid/50, map_mid/50);
     // ellipse(x, map_highmid, map_highmid/50, map_highmid/50);
     // rect(x, y, x/90, y/90);
@@ -106,5 +112,6 @@ function touchStarted() {
 }
 
 
-
-// < --------------------------------- >
+function mousePressed() {
+  record = true;
+}
